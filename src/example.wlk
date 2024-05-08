@@ -1,11 +1,37 @@
 import wollok.game.*
 
+object tanteador{
+	method text() = "Maximo Puntaje " + mario.mejorPuntaje()
+	method position() = game.at(game.width()/2,game.height()-2)
+	method agarrado() {
+	  // no escribo nada, porque no pasa nada cuando lo "agarra" mario	
+	}
+} 
+object fondo {
+    var position = game.origin().down(1)
+    
+    method image() = "auto.jpg"
+    method desplazamiento() {
+    	position = position.left(1)
+    	if (position.x() < -20)
+    	   position = position.right(40)
+    }
+	method empezarADesplazarse() {
+		game.onTick(300,"fondo",{self.desplazamiento()})
+	}
+	method position() = position 
+    
+  
+}
+
 object juego {
+	const frutas = [mani, manzana,papa,tomate]
 	method iniciar() {
 		game.cellSize(32)
 		game.height(20)
 		game.width(40)
 		game.title("Juego")
+		game.addVisual(fondo)
 //		game.addVisualCharacter(mario)
 		game.addVisual(mario)
 		self.agregarFrutas()
@@ -14,9 +40,9 @@ object juego {
 	}
 	
 	method agregarFrutas() {
-		game.addVisual(manzana) 
-		game.addVisual(papa) 
-		game.addVisual(tomate) 
+		game.addVisual(tanteador)
+		frutas.forEach{x=> 
+			game.addVisual(x)} 
 		game.onTick(5000,"moverse",{tomate.relocalizar()})
 	}
 	method configurarAcciones() {
@@ -26,7 +52,8 @@ object juego {
 		keyboard.down().onPressDo({mario.bajar()}) 
 		keyboard.left().onPressDo({mario.retroceder()}) 
 		keyboard.right().onPressDo({mario.avanzar()})
-		keyboard.space().onPressDo({mario.saltar()}) 
+		keyboard.space().onPressDo({mario.saltar()})
+		fondo.empezarADesplazarse() 
 		 
 	}
 }
@@ -60,6 +87,7 @@ object papa{
 	method agarrado() {
 		game.removeVisual(mario)
 		game.addVisual(gameOver)
+		game.removeTickEvent("fondo")
 		game.schedule(2000,{game.stop()})
 	}
 }
@@ -136,8 +164,24 @@ object mario{
 	}
 	method saltar(){
 		self.subir()
-		self.subir()
+		game.schedule(100,{self.subir()})
 		game.schedule(1000,{self.bajar() self.bajar()})
 	}
+	method mejorPuntaje() = 
+	  if (inventario.isEmpty()) 
+	    0 
+	  else
+	    (inventario.max{x=>x.puntos()}).puntos()
 	
+}
+
+object mani {
+	
+	method position() = papa.position().right(2)
+	
+	method agarrado(){
+		mario.agarrar(self)
+		game.say(self,"Maní Oculto Desbloqueado")
+	}
+	method puntos() = 100
 }
