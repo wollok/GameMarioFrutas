@@ -16,11 +16,11 @@ object juego {
 		game.addVisual(manzana) 
 		game.addVisual(papa) 
 		game.addVisual(tomate) 
-		game.onTick(1000,"moverse",{tomate.relocalizar()})
+		game.onTick(5000,"moverse",{tomate.relocalizar()})
 	}
 	method configurarAcciones() {
 		game.onCollideDo(mario, {algo=>algo.agarrado()})
-		keyboard.enter().onPressDo{game.say(mario,"Tengo " + mario.puntos() )   } 
+		keyboard.enter().onPressDo({game.say(mario,"Tengo " + mario.puntos())}) 
 	}
 }
 
@@ -33,8 +33,10 @@ object manzana {
 	
 	method agarrado() {
 		game.removeVisual(self)
-		mario.sumaPuntos(10)
+		mario.agarrar(self)
+		//mario.sumaPuntos(10)
 	}
+	method puntos() = 10
 }
 
 
@@ -65,10 +67,12 @@ object tomate{
 	method position(nueva){
 		position = nueva
 	}
+	method puntos() = -5
 	
 	method agarrado() {
-		mario.sumaPuntos(-5)
+		//mario.sumaPuntos(-5)
 		self.relocalizar()
+		mario.agarrar(self)
 	}
 	method relocalizar() {
 		position = self.validar(position
@@ -87,8 +91,9 @@ object tomate{
 
 
 object mario{
+	const inventario = []
 	var position = game.origin()
-	var puntos = 0
+//	var puntos = 0
 	method image() = "mario.png"
 	
 	method position() = position
@@ -96,8 +101,12 @@ object mario{
 		position = nueva
 	}
 	
-	method sumaPuntos(cant){
-		puntos = puntos + cant
+	method agarrar(cosa){
+		inventario.add(cosa)
 	}
-	method puntos() = puntos
+	
+//	method sumaPuntos(cant){
+//		puntos = puntos + cant
+//	}
+	method puntos() = inventario.sum({x=>x.puntos()})
 }
