@@ -16,6 +16,7 @@ object juego {
 		game.addVisual(manzana) 
 		game.addVisual(papa) 
 		game.addVisual(tomate) 
+		game.onTick(1000,"moverse",{tomate.relocalizar()})
 	}
 	method configurarAcciones() {
 		game.onCollideDo(mario, {algo=>algo.agarrado()})
@@ -50,6 +51,7 @@ object papa{
 	method agarrado() {
 		game.removeVisual(mario)
 		game.addVisual(gameOver)
+		game.schedule(2000,{game.stop()})
 	}
 }
 
@@ -69,9 +71,17 @@ object tomate{
 		self.relocalizar()
 	}
 	method relocalizar() {
-		position = position
+		position = self.validar(position
 		   .right(desplazamientos.anyOne())
-		   .up(desplazamientos.anyOne()) 
+		   .up(desplazamientos.anyOne()))
+		   
+		   
+ 
+	}
+	method validar(posicion) {
+		const nuevoY = posicion.y().min(game.height()-1).max(0) 
+		const nuevoX = posicion.x().min(game.width()-1).max(0)
+		return game.at(nuevoX,nuevoY) 
 	}
 }
 
