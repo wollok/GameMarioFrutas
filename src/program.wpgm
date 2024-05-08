@@ -1,0 +1,6 @@
+import example.*
+
+program juegoEnUnDia {
+
+	juego.iniciar()
+}
