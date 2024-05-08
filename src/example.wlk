@@ -6,7 +6,8 @@ object juego {
 		game.height(20)
 		game.width(40)
 		game.title("Juego")
-		game.addVisualCharacter(mario)
+//		game.addVisualCharacter(mario)
+		game.addVisual(mario)
 		self.agregarFrutas()
 		self.configurarAcciones()
 		game.start()
@@ -20,7 +21,13 @@ object juego {
 	}
 	method configurarAcciones() {
 		game.onCollideDo(mario, {algo=>algo.agarrado()})
-		keyboard.enter().onPressDo({game.say(mario,"Tengo " + mario.puntos())}) 
+		keyboard.enter().onPressDo({game.say(mario,"Tengo " + mario.puntos())})
+		keyboard.up().onPressDo({mario.subir()}) 
+		keyboard.down().onPressDo({mario.bajar()}) 
+		keyboard.left().onPressDo({mario.retroceder()}) 
+		keyboard.right().onPressDo({mario.avanzar()})
+		keyboard.space().onPressDo({mario.saltar()}) 
+		 
 	}
 }
 
@@ -94,7 +101,11 @@ object mario{
 	const inventario = []
 	var position = game.origin()
 //	var puntos = 0
-	method image() = "mario.png"
+    var avanza = true
+	method image() = 
+	   "mario-" 
+	   + (if (avanza) "derecha" else "izquierda" )
+	   + ".png"
 	
 	method position() = position
 	method position(nueva) {
@@ -109,4 +120,24 @@ object mario{
 //		puntos = puntos + cant
 //	}
 	method puntos() = inventario.sum({x=>x.puntos()})
+	method subir() {
+		position = position.up(1) 
+	}
+	method bajar() {
+		position = position.down(1) 
+	}
+	method avanzar() {
+		position = position.right(3) 
+		avanza = true
+	}
+	method retroceder() {
+		position = position.left(2) 
+		avanza = false
+	}
+	method saltar(){
+		self.subir()
+		self.subir()
+		game.schedule(1000,{self.bajar() self.bajar()})
+	}
+	
 }
