@@ -25,13 +25,13 @@ object fondo {
 }
 
 object juego {
-	const frutas = [mani, manzana,papa,tomate]
+	const frutas = [mani, new Manzana(),papa,tomate]
 	method iniciar() {
 		game.cellSize(32)
 		game.height(20)
 		game.width(40)
 		game.title("Juego")
-		game.addVisual(fondo)
+//		game.addVisual(fondo)
 //		game.addVisualCharacter(mario)
 		game.addVisual(mario)
 		self.agregarFrutas()
@@ -53,17 +53,18 @@ object juego {
 		keyboard.left().onPressDo({mario.retroceder()}) 
 		keyboard.right().onPressDo({mario.avanzar()})
 		keyboard.space().onPressDo({mario.saltar()})
-		fondo.empezarADesplazarse() 
+		//fondo.empezarADesplazarse() 
 		 
 	}
 }
 
 
-object manzana {
-
+class Manzana {
+	const posiblesColumnas = (3..game.width()-3)
+	const position = game.at(posiblesColumnas.anyOne(),game.height()/2)
 	method image() = "manzana.png"
 	
-	method position() = game.center()
+	method position() = position
 	
 	method agarrado() {
 		game.removeVisual(self)
@@ -94,20 +95,21 @@ object papa{
 
 object tomate{
 	const desplazamientos = [-1,5,7,-3,0]
-	var position = game.at(5,5)
+	var property position = game.at(5,5)
 	method image() = "tomate.png"
 	
-	method position() = position
-	
-	method position(nueva){
-		position = nueva
-	}
-	method puntos() = -5
+//	method position() = position
+//	
+//	method position(nueva){
+//		position = nueva
+//	}
+	method puntos() = position.x()
 	
 	method agarrado() {
 		//mario.sumaPuntos(-5)
 		self.relocalizar()
 		mario.agarrar(self)
+		game.addVisual(new Manzana())
 	}
 	method relocalizar() {
 		position = self.validar(position
@@ -127,7 +129,7 @@ object tomate{
 
 object mario{
 	const inventario = []
-	var position = game.origin()
+	var property position = game.origin()
 //	var puntos = 0
     var avanza = true
 	method image() = 
@@ -135,19 +137,20 @@ object mario{
 	   + (if (avanza) "derecha" else "izquierda" )
 	   + ".png"
 	
-	method position() = position
-	method position(nueva) {
-		position = nueva
-	}
+//	method position() = position
+//	method position(nueva) {
+//		position = nueva
+//	}
 	
 	method agarrar(cosa){
 		inventario.add(cosa)
 	}
 	
 //	method sumaPuntos(cant){
-//		puntos = puntos + cant
+//		puntos += cant
 //	}
-	method puntos() = inventario.sum({x=>x.puntos()})
+	method puntos() = inventario.sum{x=>x.puntos()}
+
 	method subir() {
 		position = position.up(1) 
 	}
